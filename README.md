@@ -1,9 +1,9 @@
 AARRR - metrics for Pirates
 -----------------------------
 
-AARRR is a MongoDB backed Rails 3 plugin that helps you track metrics for your web apps (with cohorts!).
+AARRR is a MongoDB backed Rails 3 plugin that helps you track **user lifecycle** metrics for your web apps (with cohorts!).
 
-The name comes from an acronym coined by Dave McClure that represents the five most important early metrics for any web startup: Acquisition, Activation, Revenue, Retention, and Referral. It's also what pirates say.
+The name comes from an acronym coined by Dave McClure that represents the five most important early metrics for any web startup: Acquisition, Activation, Revenue, Retention, and Referral.
 
 A quick 5 min video:<br>
 <http://500hats.typepad.com/500blogs/2007/09/startup-metrics.html>
@@ -11,9 +11,14 @@ A quick 5 min video:<br>
 Learn more about startup metrics for Pirates:<br>
 <http://www.slideshare.net/dmc500hats/startup-metrics-for-pirates-long-version>
 
+![mascot](https://github.com/railsjedi/aarrr/raw/master/aarrr.png "Mascot")
+
 ## Why you should use AARRR:
 
 AARRR is meant to quickly get you started and provide a framework for collecting and displaying data. It's goal is to help you learn what to measure, and quickly get results. It's long term goal is to really get you to think very hard about how to measure and track your users in order to provide actionable metrics about your web app.
+
+While it has support for split testing, it's main goal is to provide macro metrics for your users. For more micro experiment driven metrics, you should check out tools such as [Vanity](https://github.com/assaf/vanity) and [ABingo](http://www.bingocardcreator.com/abingo)
+
 
 ## Features:
 
@@ -116,18 +121,16 @@ Cohorts are ways to slice up reports so you can see the results for these 5 metr
 
 * Date (by day, week, month): slices up the metrics based on when users first came to your site (session creation). This is useful to see if what your building is actually improving your metrics
 
-* By Traffic Source: slices up the metrics based on where your users are coming from.
+* By Traffic Source: slices up the metrics based on where your users are coming from. This allows you to see what sources of traffic are most value and target your marketing efforts on these.
 
 
 ## Split Testing
 
 You can set up split testing easily by running
 
-    AARRR(request.env).split_on(:landing_redesign, [:v1_layout, :v2_layout]).
+    AARRR(request.env).split?(:landing_redesign, :v1_layout) #=> true
 
 This will attach the session with a randomly selected version of the split test. You can then query on this by using the `split?` method.
-
-    AARRR(request.env).split?(:landing_redesign, :v1_layout)
 
 
 ## Ignored Cohorts
@@ -139,7 +142,7 @@ This identified session that are likely "spam" and removes it from results.
 
 ## Pulling the Data out (generating reports)
 
-AARRR provides some simple views that allow you to generate some basic reports. Reports are generated via a cron job `rake aarrr:generate`. This can take a long time, however as soon as it's updated
+AARRR provides some simple views that allow you to generate some basic reports. Reports are generated via a cron job `rake aarrr:generate`. This can take a long time, however as soon as it's updated.
 
 You can also generate the reports manually by running AARRR.generate!, however I'd advise you to run it via Resque or Delayed Job as it may take a long time to generate.
 
