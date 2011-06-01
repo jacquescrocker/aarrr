@@ -71,18 +71,14 @@ If you'd rather define Acquisition events manually, just use:
 
 Activation events should be tracked as soon as your user interacts "sucessfully" with your app. You'll need to define this for your own app, however if your app is built to do something specific then you should add an activation event whenever that thing happens.
 
-    # use this to specifically activate the user
-    AARRR(request.env).track(:activation)
+    AARRR(request.env).activation!(:built_page)
 
-    # we can also mark an activation via usage (if the user is not already activated)
-    AARRR(request.env).track(:usage)
+    AARRR(request.env).activation!(:finished_game)
 
 
 ### Retention
 
-Retention is defined by how often your user keeps coming back to the app. There's no tracking event for retention (as that wouldn't make sense). However you should add tracking events for when people use the app
-
-    AARRR(request.env).track(:usage)
+Retention is defined by how often your user keeps coming back to the app. There's no tracking event for retention (since they are the same as activation).
 
 
 ### Referral
@@ -93,7 +89,7 @@ Referral should be triggered whenever someone gets someone else to sign up to yo
 Referrals are done in 2 parts. First you can track when someone decides to refer someone. This would be an "invite" link or something similar.
 
     # generate a referral
-    referral_code = AARRR(request.env).referral({email: "someone@somewhere.com"})
+    referral_code = AARRR(request.env).referral!({email: "someone@somewhere.com"})
 
     # email out the url with this referral code in the query param
     # "?_a=x71n5"
@@ -106,13 +102,13 @@ When someone enters the site without an activated session and a referral code sh
 Whenever you capture a dollar from user, then you should track that intake event.
 
     # customer paid you 55.00
-    AARRR(request.env).revenue(55.00)
+    AARRR(request.env).revenue!(55.00)
 
     # can also pass in the cents
-    AARRR(request.env).revenue_cents(5500)
+    AARRR(request.env).revenue_cents!(5500)
 
     # it's also useful to pass in a unique code here (receipt / invoice number or something) so you don't double track someone's revenue
-    AARRR(request.env).revenue(55.00, :unique => "x8175m1o58113")
+    AARRR(request.env).revenue!(55.00, :unique => "x8175m1o58113")
 
 
 ## Cohorts
@@ -126,18 +122,36 @@ Cohorts are ways to slice up reports so you can see the results for these 5 metr
 
 ## Split Testing
 
-You can set up split testing easily by running
+You can set up split testing by using:
+
+    AARRR.split_test :landing_redesign, :options => {
+      :v1_layout => 0.9,
+      :v2_layout => 0.1
+    }
+
+To use these split tests, just add the following to your views:
 
     AARRR(request.env).split?(:landing_redesign, :v1_layout) #=> true
 
-This will attach the session with a randomly selected version of the split test. You can then query on this by using the `split?` method.
+The first argument is a reference to the split test that you defined in your initializer. The second argument is the split option to return.
+
+This will attach the session with a randomly selected version of the split test and return whether it matches the second argument.
+
+You can also just return the split option currently assigned to the user by using:
+
+    AARRR(request.env).split(:landing_redesign) #=> :v1_layout
+
+Split test results can be accessed via the reports, and you can slice up the user metrics based on which users saw what split. People who saw neither splits will not be included in the results.
 
 
 ## Ignored Cohorts
 
 When you start seeing screwy data (spammers, seo, scrapers) you can selectively remove these people by configuring Ignored Cohorts. This just excludes data before running the report calculations.
 
-This identified session that are likely "spam" and removes it from results.
+This allows you to identify the AARRR users that are likely "spam" and removes them from most report results.
+
+    # pass it a mongo query that defines the users you want to ignore
+    AARRR.ignored_cohort :googlebot, "data.useragent" => /googlebot/
 
 
 ## Pulling the Data out (generating reports)
@@ -148,6 +162,6 @@ You can also generate the reports manually by running AARRR.generate!, however I
 
 Once you have the reports, you can use the AARRR view helpers in order to render your reports to a web page.
 
-Our report views probably aren't going to be exactly what you want, so we encourage you to cycle through the AAARR.report_results (returns the latest generated report results) and build up your own graphs and charts.
+Our report views probably aren't going to be exactly what you want, so we encourage you to cycle through the `AAARR.report_results` (returns the latest generated report results) and build up your own graphs and charts.
 
 
