@@ -78,7 +78,9 @@ Activation events should be tracked as soon as your user interacts "sucessfully"
 
 ### Retention
 
-Retention is defined by how often your user keeps coming back to the app. There's no tracking event for retention (since they are the same as activation).
+Retention is defined by how often your user keeps coming back to the app.
+
+    AARRR(request.env).retention!(:logged_in)
 
 
 ### Referral
@@ -97,6 +99,14 @@ Referrals are done in 2 parts. First you can track when someone decides to refer
 When someone enters the site without an activated session and a referral code shows up, then we track the referral event as soon as the user signs up.
 
 
+### Track
+
+Track allows you to trigger multiple events at a time.
+
+    AARRR(request.env).track!(:built_page, [:activation, :retention])
+
+
+
 ### Revenue
 
 Whenever you capture a dollar from user, then you should track that intake event.
@@ -113,18 +123,47 @@ Whenever you capture a dollar from user, then you should track that intake event
 
 ## Cohorts
 
-Cohorts are ways to slice up reports so you can see the results for these 5 metrics for groups of specific users. Some useful ones are:
+Cohorts are ways to slice up reports so you can see the results for these 5 metrics for groups of specific users. Some useful examples are:
 
 * Date (by day, week, month): slices up the metrics based on when users first came to your site (session creation). This is useful to see if what your building is actually improving your metrics
 
+    # assigns a cohort based on the week
+    AARRR.define_cohort :weekly do |user|
+      user["created_at"].beginning_of_week.strftime("%B %d, %Y")
+    end
+
 * By Traffic Source: slices up the metrics based on where your users are coming from. This allows you to see what sources of traffic are most value and target your marketing efforts on these.
+
+    # assigns a cohort based on the traffic source
+    AARRR.define_cohort :source do |user|
+      case user["referrer"]
+      when /google.com/, /gmail.com/
+        "google"
+      when /facebook.com/
+        "facebook"
+      else
+        nil
+      end
+    end
+
+* By gender (assuming you've captured it in data)
+
+    AARRR.define_cohort :gender do |user, data|
+      if data["gender"].to_s.upcase == "M"
+        "male"
+      elsif data["gender"].to_s.upcase == "F"
+        "female"
+      else
+        nil
+      end
+    end
 
 
 ## Split Testing
 
 You can set up split testing by using:
 
-    AARRR.split_test :landing_redesign, :options => {
+    AARRR.define_split :landing_redesign, :options => {
       :v1_layout => 0.9,
       :v2_layout => 0.1
     }
