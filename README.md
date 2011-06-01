@@ -44,7 +44,7 @@ AARRR is now set up, and will add an `around` filter to each request so it can h
 
 ## How to add tracking
 
-AARRR defines a helper method `AARRR()` that returns a "session" object.  actually just an alias to AARRR.create_session(request.env). The session object's purpose is to define a user uniquely. All tracking events should be called from the session object
+AARRR defines a helper method `AARRR()` that returns a "session" object.  actually just an alias to AARRR::Session.new(). The session object's purpose is to define a user uniquely. All tracking events should be called from the session object
 
 You can get a session in a few different ways:
 

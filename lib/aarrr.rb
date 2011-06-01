@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+require "mongo"
 require "aarrr/config"
 require "aarrr/session"
 
