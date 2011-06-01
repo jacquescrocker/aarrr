@@ -1,7 +1,7 @@
 AARRR - metrics for Pirates
 -----------------------------
 
-AARRR is a MongoDB backed Rails 3 plugin that helps you track **user lifecycle** metrics for your web apps (with cohorts!).
+AARRR is a MongoDB backed ruby library that helps you track **user lifecycle** metrics for your web apps (with cohorts!).
 
 The name comes from an acronym coined by Dave McClure that represents the five most important early metrics for any web startup: Acquisition, Activation, Revenue, Retention, and Referral.
 
@@ -26,9 +26,9 @@ While it has support for split testing, it's main goal is to provide macro metri
 
 * Uses MongoDB for storing analytics (no schema needed, and super crazy fast writes)
 
-* Easily hooks into Devise (to capture User Acquisition event)
-
 * Automatic configuration for Mongoid and MongoMapper users
+
+* Easily hooks into Devise (to capture User Acquisition event)
 
 
 ## How to Install:
@@ -148,6 +148,7 @@ Cohorts are ways to slice up reports so you can see the results for these 5 metr
 * By Keyword: slice up the users by the keyword (or groups of keyword) in order to classify users by market segment.
 
     AARRR.define_cohort :keyword do |user, data|
+      # define a `extract_keywords` method to pull out the keywords from the referrer url
       keywords = extract_keywords(user["referrer"])
       if keywords.include?("ruby") or keywords.include?("rails")
         "rails"
@@ -167,6 +168,13 @@ Cohorts are ways to slice up reports so you can see the results for these 5 metr
       else
         nil
       end
+    end
+
+* By Location
+
+    AARRR.define_cohort :location do |user, data|
+      # define get_city_for method to get the city for a particular ip address
+      get_city_for(user["ip_address"])
     end
 
 
@@ -215,7 +223,6 @@ Once you have the reports, you can use the AARRR view helpers in order to render
 Our report views probably aren't going to be exactly what you want, so we encourage you to cycle through the `AAARR.report_results` (returns the latest generated report results) and build up your own graphs and charts.
 
 
-
 ## Data Model
 
 This section describes how AARRR stores your data within the MongoDB collections (raw and reports).
@@ -224,15 +231,16 @@ This section describes how AARRR stores your data within the MongoDB collections
 
 AARRR tracks the raw metric data in a 2 main tables:
 
-`aarrr_users` tracks the unique identities of each user. the `aarrr_user_id` is used for each event.
+`aarrr_users` tracks the unique identities of each user
 
 * `_id`: generated aarrr user id
-* `user_id`: optional tie in to your database's user_id
+* `user_id`: optional tie in to your database's user_id (for drill down)
 * `data`: hash that stores any data that's passed for the user on creation. main use is for analyzing the cohort data
 * `splits`: hash that maps split testing rules to assigned splits for the user
 * `cohorts`: a hash that maps cohort rules with the results
 * `ignore_reason`: a string that represents the reason this user is ignored in reports
 * `referrer`: referrer url that user came from
+* `ip_address`: ip address for the user
 * `first_event_at`: date that the user first interacted with the site
 * `last_event_at`: date that the user last interacted with the site
 
