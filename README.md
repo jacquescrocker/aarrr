@@ -78,7 +78,7 @@ Activation events should be tracked as soon as your user interacts "sucessfully"
 
 ### Retention
 
-Retention is defined by how often your user keeps coming back to the app.
+Retention is defined by how often your user keeps coming back to the app. You can define retention rules separately in reports (e.g. 5 times in 2 months)
 
     AARRR(request.env).retention!(:logged_in)
 
@@ -101,10 +101,9 @@ When someone enters the site without an activated session and a referral code sh
 
 ### Track
 
-Track allows you to trigger multiple events at a time.
+Track allows you to trigger multiple events at a time. (defaults to :activation event)
 
     AARRR(request.env).track!(:built_page, [:activation, :retention])
-
 
 
 ### Revenue
