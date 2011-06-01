@@ -204,3 +204,35 @@ Once you have the reports, you can use the AARRR view helpers in order to render
 Our report views probably aren't going to be exactly what you want, so we encourage you to cycle through the `AAARR.report_results` (returns the latest generated report results) and build up your own graphs and charts.
 
 
+
+## Data Model
+
+This section describes how AARRR stores your data within the MongoDB collections (raw and reports).
+
+### Raw Events
+
+AARRR tracks the raw metric data in a 2 main tables:
+
+`aarrr_users` tracks the unique identities of each user. the `aarrr_user_id` is used for each event.
+
+* `_id`: generated aarrr user id
+* `user_id`: optional tie in to your database's user_id
+* `data`: hash that stores any data that's passed for the user on creation. main use is for analyzing the cohort data
+* `splits`: hash that maps split testing rules to assigned splits for the user
+* `cohorts`: a hash that maps cohort rules with the results
+* `ignore_reason`: a string that represents the reason this user is ignored in reports
+* `first_event_at`: date that the user first interacted with the site
+* `last_event_at`: date that the user last interacted with the site
+
+`aarrr_events` tracks each event that the user is engaged in.
+
+* `_id`: generated aarrr event id
+* `aarrr_user_id`: id that maps event back to the aarrr users table
+* `event_types`: array of types of the event that was tracked
+* `event_name`: name for the event that was tracked
+* `data`: data that should be tracked along with the event
+* `revenue`: revenue the was generated on this event
+* `referral_code`: referral code that was generated for this event
+
+
+
