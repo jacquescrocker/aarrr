@@ -145,6 +145,18 @@ Cohorts are ways to slice up reports so you can see the results for these 5 metr
       end
     end
 
+* By Keyword: slice up the users by the keyword (or groups of keyword) in order to classify users by market segment.
+
+    AARRR.define_cohort :keyword do |user, data|
+      keywords = extract_keywords(user["referrer"])
+      if keywords.include?("ruby") or keywords.include?("rails")
+        "rails"
+      else
+        nil
+      end
+    end
+
+
 * By gender (assuming you've captured it in data)
 
     AARRR.define_cohort :gender do |user, data|
@@ -194,7 +206,7 @@ This allows you to identify the AARRR users that are likely "spam" and removes t
 
 ## Pulling the Data out (generating reports)
 
-AARRR provides some simple views that allow you to generate some basic reports. Reports are generated via a cron job `rake aarrr:generate`. This can take a long time, however as soon as it's updated.
+AARRR provides some simple views that allow you to generate some basic reports. Reports are generated via a cron job `rake aarrr:generate`.
 
 You can also generate the reports manually by running AARRR.generate!, however I'd advise you to run it via Resque or Delayed Job as it may take a long time to generate.
 
@@ -220,6 +232,7 @@ AARRR tracks the raw metric data in a 2 main tables:
 * `splits`: hash that maps split testing rules to assigned splits for the user
 * `cohorts`: a hash that maps cohort rules with the results
 * `ignore_reason`: a string that represents the reason this user is ignored in reports
+* `referrer`: referrer url that user came from
 * `first_event_at`: date that the user first interacted with the site
 * `last_event_at`: date that the user last interacted with the site
 
@@ -233,5 +246,9 @@ AARRR tracks the raw metric data in a 2 main tables:
 * `revenue`: revenue the was generated on this event
 * `referral_code`: referral code that was generated for this event
 
+
+### Reports
+
+... TBD ...
 
 
