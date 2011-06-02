@@ -46,6 +46,15 @@ module AARRR
       })
     end
 
+    # save a cookie to the response
+    def save(response)
+      response.set_cookie(AARRR::Config.cookie_name, {
+        :value => self.id,
+        :path => "/",
+        :expires => Time.now+AARRR::Config.cookie_expiration
+      })
+    end
+
     protected
 
     # mark update

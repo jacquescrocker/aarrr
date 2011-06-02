@@ -31,6 +31,7 @@ module AARRR
     # default some options with defaults
     option :database_name, :default => "metrics"
     option :cookie_name, :default => "_utmarr"
+    option :cookie_expiration, :default => 60*24*60*60
     option :user_collection_name, :default => "aarrr_users"
     option :event_collection_name, :default => "aarrr_events"
 

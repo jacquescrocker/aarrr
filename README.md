@@ -58,6 +58,7 @@ You can get a session in a few different ways:
     # pass in the tracking code directly
     AARRR(cookies["_utmarrr"])
 
+You should then save the session to cookie: `AARRR(request.env).save(response)`
 
 ### Tracking vs Completion events
 
