@@ -7,11 +7,11 @@ module AARRR
     attr_accessor :id
 
     # find or creates a session in the db based on the env or object
-    def initialize(env_or_object = nil, data = nil)
+    def initialize(env_or_object = nil, attributes = nil)
       self.id = parse_id(env_or_object) || BSON::ObjectId.new.to_s
 
       # perform upsert
-      update({"$set" => user_attributes(env_or_object).merge(data || {})}, :upsert => true)
+      update({"$set" => build_attributes(env_or_object).merge(attributes || {})}, :upsert => true)
     end
 
     # returns a reference the othe AARRR user
@@ -24,11 +24,33 @@ module AARRR
       update({"data" => {"$set" => data}})
     end
 
+    # track event name
+    def track!(event_name, options = {})
+
+      # add event tracking
+      AARRR.events.insert({
+        "aarrr_user_id" => self.id,
+        "event_name" => event_name,
+        "event_type" => options[:event_type],
+        "in_progress" => options[:in_progress] || false,
+        "data" => options[:data],
+        "revenue" => options[:revenue],
+        "referral_code" => options[:referral_code]
+      })
+
+      # update user with last updated time
+      update({
+        "$set" => {
+          "last_event_at" => Time.now.getutc
+        }
+      })
+    end
+
     protected
 
     # mark update
-    def update(data, options = {})
-      AARRR.users.update({"_id" => id}, data, options)
+    def update(attributes, options = {})
+      AARRR.users.update({"_id" => id}, attributes, options)
     end
 
     # returns id
@@ -51,7 +73,7 @@ module AARRR
     end
 
     # returns updates
-    def user_attributes(env_or_object)
+    def build_attributes(env_or_object)
       if env_or_object.is_a?(Hash)
         user_attributes = {}
 

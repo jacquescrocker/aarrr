@@ -11,8 +11,6 @@ module AARRR
 
       it "should create a session with a request env" do
         session = Session.new
-        AARRR.users.count.should eq(1)
-
         Session.new({
           "rack.request.cookie_hash" => {
             "_utmarr" => session.id
@@ -27,6 +25,18 @@ module AARRR
         })
 
         AARRR.users.count.should eq(2)
+      end
+
+      describe "tracking" do
+        before(:each) do
+          @session = Session.new
+        end
+
+        it "should track a custom event" do
+          @session.track!(:something)
+
+          AARRR.events.count.should eq(1)
+        end
       end
     end
 

@@ -61,8 +61,7 @@ You can get a session in a few different ways:
 
 ### Tracking vs Completion events
 
-For each category of events, you can track multiple events leading up to the actual "completion" step for the step.
-
+For each category of events, you can track multiple events leading up to the actual "completion" step for a category, use the option `:in_progress => true`
 
 
 ### Acquisition
@@ -72,6 +71,11 @@ You'll probably want to track customer acquisition at the time of user signup. W
 If you'd rather define Acquisition events manually, just use:
 
     AARRR(request.env).acquisition!(:viewed_homepage)
+
+To track the funnel leading up to the acquisition event, use:
+
+    AARRR(request.env).acquisition!(:opened_signup_popup, :in_progress => true)
+
 
 ### Activation
 
@@ -97,10 +101,13 @@ Referral should be triggered whenever someone gets someone else to sign up to yo
 Referrals are done in 2 parts. First you can track when someone decides to refer someone. This would be an "invite" link or something similar.
 
     # generate a referral
-    referral_code = AARRR(request.env).referral!({email: "someone@somewhere.com"})
+    referral_code = AARRR(request.env).sent_referral!(:sent => {email: "someone@somewhere.com"})
 
     # email out the url with this referral code in the query param
     # "?_a=x71n5"
+
+    # after accepting the code
+    AARRR(request.env).accept_referral!(code)
 
 When someone enters the site without an activated session and a referral code shows up, then we track the referral event as soon as the user signs up.
 
@@ -109,7 +116,7 @@ When someone enters the site without an activated session and a referral code sh
 
 Track allows you to trigger multiple events at a time. (defaults to :activation event)
 
-    AARRR(request.env).track!(:built_page, :for => [:activation, :retention], :complete => [:activation])
+    AARRR(request.env).track!(:built_page, :event_type => :activate, :in_progress => true)
 
 
 ### Revenue
@@ -237,7 +244,7 @@ This section describes how AARRR stores your data within the MongoDB collections
 
 AARRR tracks the raw metric data in a 2 main tables:
 
-`aarrr_users` tracks the unique identities of each user
+`aarrr_users`: tracks the unique identities of each user
 
 * `_id`: generated aarrr user id
 * `user_id`: optional tie in to your database's user_id (for drill down)
@@ -247,16 +254,15 @@ AARRR tracks the raw metric data in a 2 main tables:
 * `ignore_reason`: a string that represents the reason this user is ignored in reports
 * `referrer`: referrer url that user came from
 * `ip_address`: ip address for the user
-* `first_event_at`: date that the user first interacted with the site
 * `last_event_at`: date that the user last interacted with the site
 
-`aarrr_events` tracks each event that the user is engaged in.
+`aarrr_events`: tracks each event that the user is engaged in
 
 * `_id`: generated aarrr event id
 * `aarrr_user_id`: id that maps event back to the aarrr users table
-* `event_type`: array of types of the event that was tracked
-* `completed`: array of types of the event that were completed
 * `event_name`: name for the event that was tracked
+* `event_type`: category of event type you are tracking
+* `in_progress`: true/false whether or not this event_type is in progress (not yet completed)
 * `data`: data that should be tracked along with the event
 * `revenue`: revenue the was generated on this event
 * `referral_code`: referral code that was generated for this event
