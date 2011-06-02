@@ -137,14 +137,20 @@ Whenever you capture a dollar from user, then you should track that intake event
 
 Cohorts are ways to slice up reports so you can see the results for these 5 metrics for groups of specific users. Some useful examples are:
 
-* Date (by day, week, month): slices up the metrics based on when users first came to your site (session creation). This is useful to see if what your building is actually improving your metrics
+### Date (by day, week, month)
+
+slice up the metrics based on when users first came to your site (session creation). This is useful to see if what your building is actually improving your metrics
+
 
     # assigns a cohort based on the week
     AARRR.define_cohort :weekly do |user|
       user["created_at"].beginning_of_week.strftime("%B %d, %Y")
     end
 
-* By Traffic Source: slices up the metrics based on where your users are coming from. This allows you to see what sources of traffic are most value and target your marketing efforts on these.
+
+### By Traffic Source
+
+slice up the metrics based on where your users are coming from. This allows you to see what sources of traffic are most value and target your marketing efforts on these.
 
     # assigns a cohort based on the traffic source
     AARRR.define_cohort :source do |user|
@@ -158,7 +164,9 @@ Cohorts are ways to slice up reports so you can see the results for these 5 metr
       end
     end
 
-* By Keyword: slice up the users by the keyword (or groups of keyword) in order to classify users by market segment.
+### By Keyword
+
+slice up the users by the keyword (or groups of keyword) in order to classify users by market segment.
 
     AARRR.define_cohort :keyword do |user, data|
       # define a `extract_keywords` method to pull out the keywords from the referrer url
@@ -171,7 +179,9 @@ Cohorts are ways to slice up reports so you can see the results for these 5 metr
     end
 
 
-* By gender (assuming you've captured it in data)
+### By gender (or other custom data attributes)
+
+assuming you've captured it via `AARRR(request.env).set_data(:gender => "m")`
 
     AARRR.define_cohort :gender do |user, data|
       if data["gender"].to_s.upcase == "M"
@@ -183,7 +193,7 @@ Cohorts are ways to slice up reports so you can see the results for these 5 metr
       end
     end
 
-* By Location
+### By Location
 
     AARRR.define_cohort :location do |user, data|
       # define get_city_for method to get the city for a particular ip address
