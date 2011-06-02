@@ -6,13 +6,12 @@ module AARRR
   class Session
     attr_accessor :id
 
-    def initialize(env_or_object = nil)
-      # find or creates a session in the db based on the env or object
-      #
-      # TODO
-      #
+    # find or creates a session in the db based on the env or object
+    def initialize(env_or_object = nil, data = nil)
       self.id = parse_id(env_or_object) || BSON::ObjectId.new.to_s
-      AARRR.users.update({"_id" => id}, {"$set" => user_data(env_or_object)}, :upsert => true)
+
+      # perform upsert
+      update({"$set" => user_attributes(env_or_object).merge(data || {})}, :upsert => true)
     end
 
     # returns a reference the othe AARRR user
@@ -20,11 +19,17 @@ module AARRR
       AARRR.users.find(id)
     end
 
+    # sets some additional data
     def set_data(data)
-      AARRR.users.update({"_id" => id}, {"data" => {"$set" => data}})
+      update({"data" => {"$set" => data}})
     end
 
     protected
+
+    # mark update
+    def update(data, options = {})
+      AARRR.users.update({"_id" => id}, data, options)
+    end
 
     # returns id
     def parse_id(env_or_object)
@@ -46,21 +51,21 @@ module AARRR
     end
 
     # returns updates
-    def user_data(env_or_object)
+    def user_attributes(env_or_object)
       if env_or_object.is_a?(Hash)
-        user_data = {}
+        user_attributes = {}
 
         # referrer: HTTP_REFERER
         referrer = env_or_object["HTTP_REFERER"]
-        user_data["referrer"] = referrer if referrer
+        user_attributes["referrer"] = referrer if referrer
 
         # ip_address: HTTP_X_REAL_IP || REMOTE_ADDR
         ip_address = env_or_object["HTTP_X_REAL_IP"] || env_or_object["REMOTE_ADDR"]
-        user_data["ip_address"] = ip_address if ip_address
+        user_attributes["ip_address"] = ip_address if ip_address
 
         # TODO: additional data from the env for the user
 
-        user_data
+        user_attributes
       else
         {}
       end
