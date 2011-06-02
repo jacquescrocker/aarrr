@@ -4,13 +4,27 @@ require "mongo"
 require "aarrr/config"
 require "aarrr/session"
 
+require "rack"
+require "aarrr/middleware"
+
 # add railtie
 if defined?(Rails)
   require "aarrr/railtie"
 end
 
+# helper method to initialize an AARRR session
 def AARRR(env_or_model)
-  AARRR::Session.new(env_or_model)
+  if env_or_model.is_a?(Hash) and env_or_model["rack.aarrr"]
+    env_or_model["rack.aarrr"]
+  else
+    session = AARRR::Session.new(env_or_model)
+
+    # add to the rack env (if applicable)
+    env_or_model["rack.aarrr"] = session if env_or_model.is_a?(Hash)
+
+    session
+  end
+
 end
 
 module AARRR
