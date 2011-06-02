@@ -1,5 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
+require 'rack'
+
 module AARRR
   describe Session do
 
@@ -26,17 +28,30 @@ module AARRR
 
         AARRR.users.count.should eq(2)
       end
+    end
 
-      describe "tracking" do
-        before(:each) do
-          @session = Session.new
-        end
+    describe "tracking" do
+      before(:each) do
+        @session = Session.new
+      end
 
-        it "should track a custom event" do
-          @session.track!(:something)
+      it "should track a custom event" do
+        @session.track!(:something)
 
-          AARRR.events.count.should eq(1)
-        end
+        AARRR.events.count.should eq(1)
+      end
+    end
+
+    describe "saving" do
+      it "should save the session to cookie" do
+        @session = Session.new
+        @session.track!(:some_event)
+
+        # save session to response
+        response = Rack::Response.new "some body", 200, {}
+        @session.save(response)
+
+        response.header["Set-Cookie"].should include("_utmarr=#{@session.id}")
       end
     end
 
