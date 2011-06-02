@@ -59,13 +59,19 @@ You can get a session in a few different ways:
     AARRR(cookies["_utmarrr"])
 
 
+### Tracking vs Completion events
+
+For each category of events, you can track multiple events leading up to the actual "completion" step for the step.
+
+
+
 ### Acquisition
 
 You'll probably want to track customer acquisition at the time of user signup. We can automatically hook into Devise so this event is triggered as soon as your user signs up.
 
 If you'd rather define Acquisition events manually, just use:
 
-    AARRR(request.env).acquisition!
+    AARRR(request.env).acquisition!(:viewed_homepage)
 
 ### Activation
 
@@ -103,7 +109,7 @@ When someone enters the site without an activated session and a referral code sh
 
 Track allows you to trigger multiple events at a time. (defaults to :activation event)
 
-    AARRR(request.env).track!(:built_page, [:activation, :retention])
+    AARRR(request.env).track!(:built_page, :for => [:activation, :retention], :complete => [:activation])
 
 
 ### Revenue
@@ -248,7 +254,8 @@ AARRR tracks the raw metric data in a 2 main tables:
 
 * `_id`: generated aarrr event id
 * `aarrr_user_id`: id that maps event back to the aarrr users table
-* `event_types`: array of types of the event that was tracked
+* `event_type`: array of types of the event that was tracked
+* `completed`: array of types of the event that were completed
 * `event_name`: name for the event that was tracked
 * `data`: data that should be tracked along with the event
 * `revenue`: revenue the was generated on this event

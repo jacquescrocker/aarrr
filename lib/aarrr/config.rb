@@ -8,7 +8,6 @@ module AARRR
     @settings = {}
 
     @database = nil
-    @database_name = nil
     @connection = nil
 
     # Define a configuration option with a default.
@@ -23,19 +22,17 @@ module AARRR
     #
     def option(name, options = {})
       define_method(name) do
-        settings.has_key?(name) ? settings[name] : options[:default]
+        @settings.has_key?(name) ? @settings[name] : options[:default]
       end
-      define_method("#{name}=") { |value| settings[name] = value }
+      define_method("#{name}=") { |value| @settings[name] = value }
       define_method("#{name}?") { send(name) }
     end
 
-    def database_name
-      @database_name || "metrics"
-    end
-
-    def database_name=(database_name)
-      @database_name = database_name
-    end
+    # default some options with defaults
+    option :database_name, :default => "metrics"
+    option :cookie_name, :default => "_utmarr"
+    option :user_collection_name, :default => "aarrr_users"
+    option :event_collection_name, :default => "aarrr_events"
 
     # Get the Mongo::Connection to use to pull the AARRR metrics data
     def connection
@@ -55,6 +52,14 @@ module AARRR
     # Set the Mongo::Database associated with the AARRR metrics data
     def database=(database)
       @database = database
+    end
+
+    def users
+      database[user_collection_name]
+    end
+
+    def events
+      database[event_collection_name]
     end
 
   end

@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
     "README.md"
   ]
 
+  s.add_runtime_dependency "rack", ">= 1.2.2"
   s.add_runtime_dependency "mongo", ">= 1.3.1"
   s.add_development_dependency "rspec", ">= 2.0"
 end
