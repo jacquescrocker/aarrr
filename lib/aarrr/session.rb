@@ -24,6 +24,15 @@ module AARRR
       update({"data" => {"$set" => data}})
     end
 
+    # save a cookie to the response
+    def save(response)
+      response.set_cookie(AARRR::Config.cookie_name, {
+        :value => self.id,
+        :path => "/",
+        :expires => Time.now+AARRR::Config.cookie_expiration
+      })
+    end
+
     # track event name
     def track!(event_name, options = {})
 
@@ -46,14 +55,25 @@ module AARRR
       })
     end
 
-    # save a cookie to the response
-    def save(response)
-      response.set_cookie(AARRR::Config.cookie_name, {
-        :value => self.id,
-        :path => "/",
-        :expires => Time.now+AARRR::Config.cookie_expiration
-      })
+    # more helpers
+
+    def acquisition!(event_name, options = {})
+      options[:event_type] = :acquisition
+      track!(event_name, options)
     end
+
+    def activation!(event_name, options = {})
+      options[:event_type] = :activation
+      track!(event_name, options)
+    end
+
+    def retention!(event_name, options = {})
+      options[:event_type] = :retention
+      track!(event_name, options)
+    end
+
+    # TODO: referral and revenue
+
 
     protected
 
@@ -66,9 +86,11 @@ module AARRR
     def parse_id(env_or_object)
       # check for empty case or string
 
-      # if it's a hash, then process like a request.env
+      # if it's a hash, then process like a request and pull out the cookie
       if env_or_object.is_a?(Hash)
-        (env_or_object["rack.request.cookie_hash"] || {})[AARRR::Config.cookie_name]
+
+        request = Rack::Request.new(env_or_object)
+        request.cookies[AARRR::Config.cookie_name]
 
       # if it's an object with an id, then return that
       elsif env_or_object.respond_to?(:id) and env_or_object.id.is_a?(BSON::ObjectId)

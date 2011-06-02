@@ -14,16 +14,12 @@ module AARRR
       it "should create a session with a request env" do
         session = Session.new
         Session.new({
-          "rack.request.cookie_hash" => {
-            "_utmarr" => session.id
-          }
+          "HTTP_COOKIE" => "_utmarr=#{session.id}; path=/;"
         })
         AARRR.users.count.should eq(1)
 
         session = Session.new({
-          "rack.request.cookie_hash" => {
-            "_utmarr" => "x9x9x19x"
-          }
+          "HTTP_COOKIE" => "_utmarr=x83y1; path=/;"
         })
 
         AARRR.users.count.should eq(2)
