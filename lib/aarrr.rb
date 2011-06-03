@@ -14,13 +14,13 @@ end
 
 # helper method to initialize an AARRR session
 def AARRR(env_or_model)
-  if env_or_model.is_a?(Hash) and env_or_model["rack.aarrr"]
-    env_or_model["rack.aarrr"]
+  if env_or_model.is_a?(Hash) and env_or_model["aarrr.session"]
+    env_or_model["aarrr.session"]
   else
     session = AARRR::Session.new(env_or_model)
 
     # add to the rack env (if applicable)
-    env_or_model["rack.aarrr"] = session if env_or_model.is_a?(Hash)
+    env_or_model["aarrr.session"] = session if env_or_model.is_a?(Hash)
 
     session
   end

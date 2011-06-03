@@ -18,9 +18,9 @@ describe "AARRR()" do
       AARRR.users.count.should eq(1)
     end
 
-    it "should set the rack.aarrr env variable" do
+    it "should set the aarrr.session env variable" do
       user_attributes = AARRR.users.find_one
-      @env["rack.aarrr"].id.should eq(user_attributes["_id"])
+      @env["aarrr.session"].id.should eq(user_attributes["_id"])
     end
   end
 
