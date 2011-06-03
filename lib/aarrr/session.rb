@@ -37,7 +37,7 @@ module AARRR
     def track!(event_name, options = {})
 
       # add event tracking
-      AARRR.events.insert({
+      result = AARRR.events.insert({
         "aarrr_user_id" => self.id,
         "event_name" => event_name,
         "event_type" => options[:event_type],
@@ -53,6 +53,8 @@ module AARRR
           "last_event_at" => Time.now.getutc
         }
       })
+
+      result
     end
 
     # more helpers
