@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require "active_support/hash/indifferent_access"
+
 module AARRR
 
   # an AARR session is used to identify a particular user in order to track events
@@ -35,23 +37,26 @@ module AARRR
 
     # track event name
     def track!(event_name, options = {})
+      options = options.with_indifferent_access
 
       # add event tracking
       result = AARRR.events.insert({
         "aarrr_user_id" => self.id,
         "event_name" => event_name,
-        "event_type" => options[:event_type],
-        "in_progress" => options[:in_progress] || false,
-        "data" => options[:data],
-        "revenue" => options[:revenue],
-        "referral_code" => options[:referral_code]
+        "event_type" => options["event_type"],
+        "in_progress" => options["in_progress"] || false,
+        "data" => options["data"],
+        "revenue" => options["revenue"],
+        "referral_code" => options["referral_code"]
       })
 
       # update user with last updated time
+      user_updates = {
+        "last_event_at" => Time.now.getutc
+      }
+      user_updates["user_id"] = options["user_id"] if options["user_id"]
       update({
-        "$set" => {
-          "last_event_at" => Time.now.getutc
-        }
+        "$set" => user_updates
       })
 
       result
