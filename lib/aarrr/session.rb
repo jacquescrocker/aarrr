@@ -10,15 +10,28 @@ module AARRR
 
     # find or creates a session in the db based on the env or object
     def initialize(env_or_object = nil, attributes = nil)
-      self.id = parse_id(env_or_object) || BSON::ObjectId.new.to_s
+      # if it's an object with an id, then return that
+      if env_or_object.respond_to?(:id) and env_or_object.id.is_a?(BSON::ObjectId)
+        user_id = env_or_object.id.to_s
+        attributes = {"$set" => attributes || {}}
+        AARRR.users.update({"user_id" => user_id}, attributes, :upsert => true, :safe => true)
 
-      # perform upsert
-      update({"$set" => build_attributes(env_or_object).merge(attributes || {})}, :upsert => true)
+        # set newly created id
+        user = AARRR.users.find_one({"user_id" => user_id})
+        self.id = user["_id"] if user.present?
+      else
+        # perform upsert to build object
+        self.id = parse_id(env_or_object) || BSON::ObjectId.new.to_s
+
+        attributes = {"$set" => build_attributes(env_or_object).merge(attributes || {})}
+        AARRR.users.update({"_id" => id}, attributes, :upsert => true)
+      end
+
     end
 
     # returns a reference the othe AARRR user
     def user
-      AARRR.users.find(id)
+      AARRR.users.find(id).find_one
     end
 
     # sets some additional data
@@ -47,7 +60,8 @@ module AARRR
         "in_progress" => options["in_progress"] || false,
         "data" => options["data"],
         "revenue" => options["revenue"],
-        "referral_code" => options["referral_code"]
+        "referral_code" => options["referral_code"],
+        "client" => options["client"]
       })
 
       # update user with last updated time
@@ -99,10 +113,6 @@ module AARRR
         request = Rack::Request.new(env_or_object)
         request.cookies[AARRR::Config.cookie_name]
 
-      # if it's an object with an id, then return that
-      elsif env_or_object.respond_to?(:id) and env_or_object.id.is_a?(BSON::ObjectId)
-        env_or_object.id.to_s
-
       # if it's a string
       elsif env_or_object.is_a?(String)
         env_or_object
@@ -123,7 +133,10 @@ module AARRR
         ip_address = env_or_object["HTTP_X_REAL_IP"] || env_or_object["REMOTE_ADDR"]
         user_attributes["ip_address"] = ip_address if ip_address
 
-        # TODO: additional data from the env for the user
+        # set user_id if its in the session
+        if env_or_object["rack.session"].is_a?(Hash) and env_or_object["rack.session"]["user_id"].present?
+          user_attributes["user_id"] = env_or_object["rack.session"]["user_id"].to_s
+        end
 
         user_attributes
       else
