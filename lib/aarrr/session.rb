@@ -55,7 +55,7 @@ module AARRR
       # add event tracking
       result = AARRR.events.insert({
         "aarrr_user_id" => self.id,
-        "event_name" => event_name,
+        "event_name" => event_name.to_s,
         "event_type" => options["event_type"],
         "in_progress" => options["in_progress"] || false,
         "data" => options["data"],
