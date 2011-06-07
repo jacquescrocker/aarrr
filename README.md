@@ -278,6 +278,7 @@ AARRR tracks the raw metric data in a 2 main tables:
 * `revenue`: revenue the was generated on this event
 * `referral_code`: referral code that was generated for this event
 * `client`: client used (web, device, etc)
+* `created_at`: date the event was performed
 
 ### Reports
 

@@ -61,7 +61,8 @@ module AARRR
         "data" => options["data"],
         "revenue" => options["revenue"],
         "referral_code" => options["referral_code"],
-        "client" => options["client"]
+        "client" => options["client"],
+        "created_at" => options["created_at"] || Time.now.getutc
       })
 
       # update user with last updated time
