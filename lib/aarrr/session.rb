@@ -40,7 +40,7 @@ module AARRR
     end
 
     # save a cookie to the response
-    def save(response)
+    def set_cookie(response)
       response.set_cookie(AARRR::Config.cookie_name, {
         :value => self.id,
         :path => "/",

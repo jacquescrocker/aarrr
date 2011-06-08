@@ -12,7 +12,7 @@ module AARRR
 
       # sets a tracking cookie on the response
       response = Rack::Response.new body, status, headers
-      aarrr_session.save(response)
+      aarrr_session.set_cookie(response)
 
       response.finish
     end

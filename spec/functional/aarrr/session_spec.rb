@@ -45,7 +45,7 @@ module AARRR
 
         # save session to response
         response = Rack::Response.new "some body", 200, {}
-        @session.save(response)
+        @session.set_cookie(response)
 
         response.header["Set-Cookie"].should include("_utmarr=#{@session.id}")
       end
