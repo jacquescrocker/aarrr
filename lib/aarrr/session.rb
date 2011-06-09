@@ -69,7 +69,7 @@ module AARRR
       user_updates = {
         "last_event_at" => Time.now.getutc
       }
-      user_updates["user_id"] = options["user_id"] if options["user_id"]
+      user_updates["user_id"] = options["user_id"].to_s if options["user_id"]
       update({
         "$set" => user_updates
       })
