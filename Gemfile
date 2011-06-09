@@ -14,3 +14,4 @@ gem "guard"
 gem "guard-rspec"
 
 gem "rake", "= 0.8.7"
+gem "rack-test"
