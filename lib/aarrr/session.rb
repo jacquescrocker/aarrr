@@ -31,7 +31,7 @@ module AARRR
 
     # returns a reference the othe AARRR user
     def user
-      AARRR.users.find(id).find_one
+      AARRR.users.find_one('_id' => id)
     end
 
     # sets some additional data
