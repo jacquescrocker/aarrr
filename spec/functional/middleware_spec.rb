@@ -41,5 +41,10 @@ describe 'an app that includes the aarrr middleware' do
       get '/'
       last_response.headers['Set-Cookie'].should =~ /_utmarr/
     end
+
+    it "includes both cookies" do
+      get '/'
+      last_response.headers['Set-Cookie'].split('\n').should have(2).items
+    end
   end
 end
