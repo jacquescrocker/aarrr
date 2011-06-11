@@ -129,7 +129,7 @@ module AARRR
 
       # if it's a hash, then process like a request and pull out the cookie
       if env_or_object.is_a?(Hash)
-        if env_or_object["rack.session"].is_a?(Hash) and env_or_object["rack.session"]["user_id"].present?
+        if env_or_object["rack.session"].is_a?(Hash) and env_or_object["rack.session"]["user_id"]
           # lookup user_id
           user = AARRR.users.find_one({"user_id" => env_or_object["rack.session"]["user_id"].to_s})
           if user.present?
@@ -166,7 +166,7 @@ module AARRR
         user_attributes["ip_address"] = ip_address if ip_address
 
         # set user_id if its in the session
-        if env_or_object["rack.session"].is_a?(Hash) and env_or_object["rack.session"]["user_id"].present?
+        if env_or_object["rack.session"].is_a?(Hash) and env_or_object["rack.session"]["user_id"]
           user_attributes["user_id"] = env_or_object["rack.session"]["user_id"].to_s
         end
 
