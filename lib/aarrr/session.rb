@@ -110,10 +110,12 @@ module AARRR
 
       # if it's a hash, then process like a request and pull out the cookie
       if env_or_object.is_a?(Hash)
-
-        request = Rack::Request.new(env_or_object)
-        request.cookies[AARRR::Config.cookie_name]
-
+        if env_or_object["aarrr.id"]
+          env_or_object["aarrr.id"]
+        else
+          request = Rack::Request.new(env_or_object)
+          request.cookies[AARRR::Config.cookie_name]
+        end
       # if it's a string
       elsif env_or_object.is_a?(String)
         env_or_object
