@@ -56,7 +56,7 @@ module AARRR
       result = AARRR.events.insert({
         "aarrr_user_id" => self.id,
         "event_name" => event_name.to_s,
-        "event_type" => options["event_type"],
+        "event_type" => translate_event_type(options["event_type"]),
         "in_progress" => options["in_progress"] || false,
         "data" => options["data"],
         "revenue" => options["revenue"],
@@ -98,6 +98,25 @@ module AARRR
 
 
     protected
+
+    # expand event type
+    def translate_event_type(event_type)
+      event_type = event_type.to_s
+      case event_type
+      when "acq"
+        "acquisition"
+      when "act"
+        "activation"
+      when "ret"
+        "retention"
+      when "rev"
+        "revenue"
+      when "ref"
+        "referral"
+      else
+        event_type
+      end
+    end
 
     # mark update
     def update(attributes, options = {})
