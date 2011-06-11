@@ -129,7 +129,17 @@ module AARRR
 
       # if it's a hash, then process like a request and pull out the cookie
       if env_or_object.is_a?(Hash)
-        if env_or_object["aarrr.id"]
+        if env_or_object["rack.session"].is_a?(Hash) and env_or_object["rack.session"]["user_id"].present?
+          # lookup user_id
+          user = AARRR.users.find_one({"user_id" => env_or_object["rack.session"]["user_id"].to_s})
+          if user.present?
+            if env_or_object["aarrr.id"]
+              # TODO: convert aarrr.id items to attach to current user
+            end
+
+            user["_id"]
+          end
+        elsif env_or_object["aarrr.id"]
           env_or_object["aarrr.id"]
         else
           request = Rack::Request.new(env_or_object)
