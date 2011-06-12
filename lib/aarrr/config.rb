@@ -34,6 +34,7 @@ module AARRR
     option :cookie_expiration, :default => 60*24*60*60
     option :user_collection_name, :default => "aarrr_users"
     option :event_collection_name, :default => "aarrr_events"
+    option :suppress_errors, :default => false
 
     # Get the Mongo::Connection to use to pull the AARRR metrics data
     def connection

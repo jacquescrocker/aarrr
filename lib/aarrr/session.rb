@@ -27,6 +27,12 @@ module AARRR
         AARRR.users.update({"_id" => id}, attributes, :upsert => true)
       end
 
+    rescue Exception => e
+      if AARRR.suppress_errors
+        puts "Unable to log metrics: #{e.to_s}"
+      else
+        raise e
+      end
     end
 
     # returns a reference the othe AARRR user
@@ -75,6 +81,13 @@ module AARRR
       })
 
       result
+
+    rescue Exception => e
+      if AARRR.suppress_errors
+        puts "Unable to log metrics: #{e.to_s}"
+      else
+        raise e
+      end
     end
 
     def track!(event_name, options = {})
