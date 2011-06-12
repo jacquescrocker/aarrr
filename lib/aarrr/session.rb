@@ -49,7 +49,7 @@ module AARRR
     end
 
     # track event name
-    def track!(event_name, options = {})
+    def track(event_name, options = {})
       options = options.with_indifferent_access
 
       # add event tracking
@@ -57,7 +57,7 @@ module AARRR
         "aarrr_user_id" => self.id,
         "event_name" => event_name.to_s,
         "event_type" => translate_event_type(options["event_type"]),
-        "in_progress" => options["in_progress"] || false,
+        "complete" => options["complete"] || false,
         "data" => options["data"],
         "revenue" => options["revenue"],
         "referral_code" => options["referral_code"],
@@ -77,35 +77,70 @@ module AARRR
       result
     end
 
-    # more helpers
+    def track!(event_name, options = {})
+      options[:complete] = true
+      track(event_name, options)
+    end
+
+    # helpers
+
+    def acquisition(event_name, options = {})
+      options[:event_type] = :acquisition
+      track(event_name, options)
+    end
+    alias :acq :acquisition
 
     def acquisition!(event_name, options = {})
-      options[:event_type] = :acquisition
-      track!(event_name, options)
+      options[:complete] = true
+      acquisition(event_name, options)
     end
     alias :acq! :acquisition!
 
-    def activation!(event_name, options = {})
+    def activation(event_name, options = {})
       options[:event_type] = :activation
-      track!(event_name, options)
+      track(event_name, options)
+    end
+    alias :act :activation
+
+    def activation!(event_name, options = {})
+      options[:complete] = true
+      activation(event_name, options)
     end
     alias :act! :activation!
 
-    def retention!(event_name, options = {})
+    def retention(event_name, options = {})
       options[:event_type] = :retention
-      track!(event_name, options)
+      track(event_name, options)
+    end
+    alias :ret :retention
+
+    def retention!(event_name, options = {})
+      options[:complete] = true
+      retention(event_name, options)
     end
     alias :ret! :retention!
 
-    def referral!(event_name, options = {})
+    def referral(event_name, options = {})
       options[:event_type] = :referral
-      track!(event_name, options)
+      track(event_name, options)
+    end
+    alias :ref :referral
+
+    def referral!(event_name, options = {})
+      options[:complete] = true
+      referral(event_name, options)
     end
     alias :ref! :referral!
 
-    def revenue!(event_name, options = {})
+    def revenue(event_name, options = {})
       options[:event_type] = :revenue
-      track!(event_name, options)
+      track(event_name, options)
+    end
+    alias :rev :revenue
+
+    def revenue!(event_name, options = {})
+      options[:complete] = true
+      revenue(event_name, options)
     end
     alias :rev! :revenue!
 

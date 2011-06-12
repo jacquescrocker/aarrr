@@ -13,11 +13,11 @@ if defined?(Rails)
 end
 
 # helper method to initialize an AARRR session
-def AARRR(env_or_model)
+def AARRR(env_or_model, attributes = nil)
   if env_or_model.is_a?(Hash) and env_or_model["aarrr.session"]
     env_or_model["aarrr.session"]
   else
-    session = AARRR::Session.new(env_or_model)
+    session = AARRR::Session.new(env_or_model, attributes)
 
     # add to the rack env (if applicable)
     env_or_model["aarrr.session"] = session if env_or_model.is_a?(Hash)

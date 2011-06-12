@@ -58,11 +58,14 @@ You can get a session in a few different ways:
     # pass in the tracking code directly
     AARRR(cookies["_utmarrr"])
 
-You should then save the session to cookie: `AARRR(request.env).save(response)`
+You should then save the session to cookie: `AARRR(request.env).set_cookie(response)`
 
-### Tracking vs Completion events
 
-For each category of events, you can track multiple events leading up to the actual "completion" step for a category, use the option `:in_progress => true`
+### Completion events
+
+For each category of events, each events you log leads up to a "completion" step for a category. Once you hit an event that provides a "completion" step, add :complete => true. You can also use the ! version of the method to designate that the funnel has been completed for this action.
+
+    AARRR(request.env).acquisition!(:signed_up) #=> passes along :complete => true
 
 
 ### Acquisition
@@ -75,7 +78,7 @@ If you'd rather define Acquisition events manually, just use:
 
 To track the funnel leading up to the acquisition event, use:
 
-    AARRR(request.env).acquisition!(:opened_signup_popup, :in_progress => true)
+    AARRR(request.env).acquisition(:opened_signup_popup)
 
 
 ### Activation
@@ -113,13 +116,6 @@ Referrals are done in 2 parts. First you can track when someone decides to refer
 When someone enters the site without an activated session and a referral code shows up, then we track the referral event as soon as the user signs up.
 
 
-### Track
-
-Track allows you to trigger multiple events at a time. (defaults to :activation event)
-
-    AARRR(request.env).track!(:built_page, :event_type => :activate, :in_progress => true)
-
-
 ### Revenue
 
 Whenever you capture a dollar from user, then you should track that intake event.
@@ -132,6 +128,22 @@ Whenever you capture a dollar from user, then you should track that intake event
 
     # it's also useful to pass in a unique code here (receipt / invoice number or something) so you don't double track someone's revenue
     AARRR(request.env).revenue!(55.00, :unique => "x8175m1o58113")
+
+
+### Track
+
+Track allows you to trigger multiple events at a time. (defaults to :activation event)
+
+    AARRR(request.env).track!(:built_page, :event_type => :activate)
+
+
+### Shortened helper aliases
+
+    AARRR.acq #=> same as AARRR.acquisition
+    AARRR.act #=> same as AARRR.activation
+    AARRR.ret #=> same as AARRR.retention
+    AARRR.ref #=> same as AARRR.referral
+    AARRR.rev #=> same as AARRR.revenue
 
 
 ## Cohorts
