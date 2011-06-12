@@ -83,19 +83,31 @@ module AARRR
       options[:event_type] = :acquisition
       track!(event_name, options)
     end
+    alias :acq! :acquisition!
 
     def activation!(event_name, options = {})
       options[:event_type] = :activation
       track!(event_name, options)
     end
+    alias :act! :activation!
 
     def retention!(event_name, options = {})
       options[:event_type] = :retention
       track!(event_name, options)
     end
+    alias :ret! :retention!
 
-    # TODO: referral and revenue
+    def referral!(event_name, options = {})
+      options[:event_type] = :referral
+      track!(event_name, options)
+    end
+    alias :ref! :referral!
 
+    def revenue!(event_name, options = {})
+      options[:event_type] = :revenue
+      track!(event_name, options)
+    end
+    alias :rev! :revenue!
 
     protected
 
