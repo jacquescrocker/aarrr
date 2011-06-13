@@ -285,7 +285,7 @@ AARRR tracks the raw metric data in a 2 main tables:
 * `aarrr_user_id`: id that maps event back to the aarrr users table
 * `event_name`: name for the event that was tracked
 * `event_type`: category of event type you are tracking
-* `in_progress`: true/false whether or not this event_type is in progress (not yet completed)
+* `complete`: true/false whether or not this event_type is a fully compeleted event
 * `data`: data that should be tracked along with the event
 * `revenue`: revenue the was generated on this event
 * `referral_code`: referral code that was generated for this event
