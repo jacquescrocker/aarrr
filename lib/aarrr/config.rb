@@ -36,6 +36,19 @@ module AARRR
     option :event_collection_name, :default => "aarrr_events"
     option :suppress_errors, :default => false
 
+    # set default client
+    option :default_client, :default => "web"
+
+    # match clients
+    option :client_matchers, :default => {}
+
+    # add a client matcher
+    def match_client(client_name, matcher = nil)
+      if matcher
+        client_matchers[client_name.to_s] = matcher
+      end
+    end
+
     # Get the Mongo::Connection to use to pull the AARRR metrics data
     def connection
       @connection || Mongo::Connection.new

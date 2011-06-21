@@ -7,6 +7,7 @@ module AARRR
   # an AARR session is used to identify a particular user in order to track events
   class Session
     attr_accessor :id
+    attr_accessor :env
 
     # find or creates a session in the db based on the env or object
     def initialize(env_or_object = nil, attributes = nil)
@@ -21,6 +22,7 @@ module AARRR
         self.id = user["_id"] if user.present?
       else
         # perform upsert to build object
+        self.env = env_or_object
         self.id = parse_id(env_or_object) || BSON::ObjectId.new.to_s
 
         attributes = {"$set" => build_attributes(env_or_object).merge(attributes || {})}
@@ -67,7 +69,7 @@ module AARRR
         "data" => options["data"],
         "revenue" => options["revenue"],
         "referral_code" => options["referral_code"],
-        "client" => options["client"],
+        "client" => options["client"] || get_client_name,
         "created_at" => options["created_at"] || Time.now.getutc
       })
 
@@ -208,8 +210,23 @@ module AARRR
       # if it's a string
       elsif env_or_object.is_a?(String)
         env_or_object
-
       end
+    end
+
+    # try to pull out client name from env
+    def get_client_name
+      client_name = nil
+      if env.present?
+        AARRR::Config.client_matchers.each do |key, matcher|
+          if matcher.respond_to?(:call) and matcher.call(env)
+            client_name = key
+            break
+          end
+        end
+      end
+
+      # return client name
+      client_name || AARRR::Config.default_client
     end
 
     # returns updates
