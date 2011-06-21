@@ -70,6 +70,7 @@ module AARRR
         "revenue" => options["revenue"],
         "referral_code" => options["referral_code"],
         "client" => options["client"] || get_client_name,
+        "user_agent" => options["user_agent"] || get_user_agent,
         "created_at" => options["created_at"] || Time.now.getutc
       })
 
@@ -227,6 +228,12 @@ module AARRR
 
       # return client name
       client_name || AARRR::Config.default_client
+    end
+
+    def get_user_agent
+      if env.present?
+        env["HTTP_USER_AGENT"].to_s
+      end
     end
 
     # returns updates
