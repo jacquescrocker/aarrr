@@ -7,16 +7,25 @@ module AARRR
     attr_accessor :id
 
     # find or creates a session in the db based on the env or object
-    def initialize(env_or_object = nil, attributes = nil)
+    def initialize(env_or_object = nil, attributes = { })
       self.id = parse_id(env_or_object) || BSON::ObjectId.new.to_s
 
       # perform upsert
-      update({"$set" => build_attributes(env_or_object).merge(attributes || {})}, :upsert => true)
+      update({"$set" => build_attributes(env_or_object).merge(attributes)}, :upsert => true)
     end
 
     # returns a reference the othe AARRR user
     def user
-      AARRR.users.find(id)
+      AARRR.users.find(:_id => id).next_document
+    end
+    
+    def created_date
+      # Turns the Object ID in Mongo actually contains the generation date.
+      # Therefore, we can use that to determine when the Session was created.
+      # Keep in mind, this is the first point of contact with the user, not a
+      # traditional 'web session' (that expires after like 20 mins)
+      bson = BSON::ObjectId.from_string id
+      bson.generation_time
     end
 
     # sets some additional data
@@ -80,7 +89,7 @@ module AARRR
     protected
 
     # mark update
-    def update(attributes, options = {})
+    def update(attributes, options = {})      
       AARRR.users.update({"_id" => id}, attributes, options)
     end
 
@@ -98,10 +107,9 @@ module AARRR
       elsif env_or_object.respond_to?(:id) and env_or_object.id.is_a?(BSON::ObjectId)
         env_or_object.id.to_s
 
-      # if it's a string
       elsif env_or_object.is_a?(String)
+        # assume the string is the ID itself
         env_or_object
-
       end
     end
 
@@ -117,7 +125,7 @@ module AARRR
         # ip_address: HTTP_X_REAL_IP || REMOTE_ADDR
         ip_address = env_or_object["HTTP_X_REAL_IP"] || env_or_object["REMOTE_ADDR"]
         user_attributes["ip_address"] = ip_address if ip_address
-
+        
         # TODO: additional data from the env for the user
 
         user_attributes
