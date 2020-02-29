@@ -13,5 +13,5 @@ gem "growl"
 gem "guard"
 gem "guard-rspec"
 
-gem "rake", "= 0.8.7"
+gem "rake", "12.3.3"
 gem "rack-test"
